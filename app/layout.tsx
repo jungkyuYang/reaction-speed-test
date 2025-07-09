@@ -35,6 +35,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Google Search Console 사이트 소유권 확인 메타 태그 */}
+        <meta
+          name="google-site-verification"
+          content="bAh4jtN2eht-I2sar6pb9J7fM4vMXA63Jwi1-BRdzWU"
+        />
+
         {/* Google AdSense 사이트 소유권 확인 메타 태그 */}
         <meta name="google-adsense-account" content="ca-pub-639237491255374" />
 

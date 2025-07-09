@@ -1,21 +1,21 @@
-"use client";
+"use client"
 
-import type React from "react";
+import type React from "react"
 
-import { useEffect } from "react";
+import { useEffect } from "react"
 
 declare global {
   interface Window {
-    adsbygoogle: unknown[];
+    adsbygoogle: any[]
   }
 }
 
 interface GoogleAdProps {
-  adSlot: string;
-  adFormat?: string;
-  fullWidthResponsive?: boolean;
-  style?: React.CSSProperties;
-  className?: string;
+  adSlot: string
+  adFormat?: string
+  fullWidthResponsive?: boolean
+  style?: React.CSSProperties
+  className?: string
 }
 
 export function GoogleAd({
@@ -28,12 +28,12 @@ export function GoogleAd({
   useEffect(() => {
     try {
       if (typeof window !== "undefined" && window.adsbygoogle) {
-        window.adsbygoogle.push({});
+        window.adsbygoogle.push({})
       }
     } catch (error) {
-      console.error("AdSense error:", error);
+      console.error("AdSense error:", error)
     }
-  }, []);
+  }, [])
 
   return (
     <div className={`ad-container ${className}`}>
@@ -46,7 +46,7 @@ export function GoogleAd({
         data-full-width-responsive={fullWidthResponsive.toString()}
       />
     </div>
-  );
+  )
 }
 
 // 배너 광고 컴포넌트
@@ -58,7 +58,7 @@ export function BannerAd({ className = "" }: { className?: string }) {
       style={{ display: "block", width: "100%", height: "90px" }}
       className={className}
     />
-  );
+  )
 }
 
 // 사각형 광고 컴포넌트
@@ -70,7 +70,7 @@ export function SquareAd({ className = "" }: { className?: string }) {
       style={{ display: "block", width: "300px", height: "250px" }}
       className={className}
     />
-  );
+  )
 }
 
 // 반응형 광고 컴포넌트
@@ -82,5 +82,5 @@ export function ResponsiveAd({ className = "" }: { className?: string }) {
       style={{ display: "block" }}
       className={className}
     />
-  );
+  )
 }

@@ -1,146 +1,134 @@
-"use client";
+"use client"
 
-import { useState, useEffect, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Clock, MousePointer, Trophy, RotateCcw, Globe } from "lucide-react";
-import { SubmitScore } from "@/components/submit-score";
-import { Leaderboard } from "@/components/leaderboard";
-import { AdBanner } from "@/components/ad-banner";
-import { ResponsiveAd, SquareAd } from "@/components/google-ads";
+import { useState, useEffect, useRef } from "react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Badge } from "@/components/ui/badge"
+import { Clock, MousePointer, Trophy, RotateCcw, Globe } from "lucide-react"
+import { SubmitScore } from "@/components/submit-score"
+import { Leaderboard } from "@/components/leaderboard"
+import { AdBanner } from "@/components/ad-banner"
+import { ResponsiveAd, SquareAd } from "@/components/google-ads"
 
 export default function ReactionSpeedTest() {
   // State for click test
-  const [clickCount, setClickCount] = useState(0);
-  const [clickTestActive, setClickTestActive] = useState(false);
-  const [clickTestTimeLeft, setClickTestTimeLeft] = useState(10);
-  const [clicksPerSecond, setClicksPerSecond] = useState(0);
-  const [bestClicksPerSecond, setBestClicksPerSecond] = useState(0);
+  const [clickCount, setClickCount] = useState(0)
+  const [clickTestActive, setClickTestActive] = useState(false)
+  const [clickTestTime, setClickTestTime] = useState(10)
+  const [clickTestTimeLeft, setClickTestTimeLeft] = useState(10)
+  const [clicksPerSecond, setClicksPerSecond] = useState(0)
+  const [bestClicksPerSecond, setBestClicksPerSecond] = useState(0)
 
   // State for reaction test
-  const [reactionState, setReactionState] = useState<
-    "waiting" | "ready" | "clicking" | "results"
-  >("waiting");
-  const [reactionStartTime, setReactionStartTime] = useState(0);
-  const [reactionTime, setReactionTime] = useState(0);
-  const [bestReactionTime, setBestReactionTime] = useState(
-    Number.POSITIVE_INFINITY
-  );
-  // const [countdownTime, setCountdownTime] = useState(0)
+  const [reactionState, setReactionState] = useState<"waiting" | "ready" | "clicking" | "results">("waiting")
+  const [reactionStartTime, setReactionStartTime] = useState(0)
+  const [reactionTime, setReactionTime] = useState(0)
+  const [bestReactionTime, setBestReactionTime] = useState(Number.POSITIVE_INFINITY)
+  const [countdownTime, setCountdownTime] = useState(0)
 
   // Refs for timers
-  const clickTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const reactionTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const clickTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const reactionTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   // Load best scores from localStorage
   useEffect(() => {
-    const storedBestClick = localStorage.getItem("best_click_score");
+    const storedBestClick = localStorage.getItem("best_click_score")
     if (storedBestClick) {
-      setBestClicksPerSecond(Number.parseFloat(storedBestClick));
+      setBestClicksPerSecond(Number.parseFloat(storedBestClick))
     }
 
-    const storedBestReaction = localStorage.getItem("best_reaction_score");
+    const storedBestReaction = localStorage.getItem("best_reaction_score")
     if (storedBestReaction) {
-      setBestReactionTime(Number.parseFloat(storedBestReaction));
+      setBestReactionTime(Number.parseFloat(storedBestReaction))
     }
-  }, []);
+  }, [])
 
   // Click test functions
   const startClickTest = () => {
-    setClickCount(0);
-    setClickTestTimeLeft(10);
-    setClickTestActive(true);
+    setClickCount(0)
+    setClickTestTimeLeft(clickTestTime)
+    setClickTestActive(true)
 
     clickTimerRef.current = setInterval(() => {
       setClickTestTimeLeft((prev) => {
         if (prev <= 1) {
-          clearInterval(clickTimerRef.current as NodeJS.Timeout);
-          setClickTestActive(false);
-          const cps = clickCount / 10;
-          setClicksPerSecond(cps);
+          clearInterval(clickTimerRef.current as NodeJS.Timeout)
+          setClickTestActive(false)
+          const cps = clickCount / clickTestTime
+          setClicksPerSecond(cps)
           if (cps > bestClicksPerSecond) {
-            setBestClicksPerSecond(cps);
-            localStorage.setItem("best_click_score", cps.toString());
+            setBestClicksPerSecond(cps)
+            localStorage.setItem("best_click_score", cps.toString())
           }
-          return 0;
+          return 0
         }
-        return prev - 1;
-      });
-    }, 1000);
-  };
+        return prev - 1
+      })
+    }, 1000)
+  }
 
   const handleClick = () => {
     if (clickTestActive) {
-      setClickCount((prev) => prev + 1);
+      setClickCount((prev) => prev + 1)
     }
-  };
+  }
 
   // Reaction test functions
   const startReactionTest = () => {
-    setReactionState("ready");
+    setReactionState("ready")
 
     // Random delay between 1-5 seconds
-    const randomDelay = Math.floor(Math.random() * 4000) + 1000;
-    // setCountdownTime(randomDelay)
+    const randomDelay = Math.floor(Math.random() * 4000) + 1000
+    setCountdownTime(randomDelay)
 
     // Clear any existing timer
-    if (reactionTimerRef.current) clearTimeout(reactionTimerRef.current);
+    if (reactionTimerRef.current) clearTimeout(reactionTimerRef.current)
 
     reactionTimerRef.current = setTimeout(() => {
-      setReactionState("clicking");
-      setReactionStartTime(Date.now());
-    }, randomDelay);
-  };
+      setReactionState("clicking")
+      setReactionStartTime(Date.now())
+    }, randomDelay)
+  }
 
   const handleReactionClick = () => {
     if (reactionState === "waiting") {
-      startReactionTest();
+      startReactionTest()
     } else if (reactionState === "ready") {
       // Clicked too early
-      clearTimeout(reactionTimerRef.current as NodeJS.Timeout);
-      setReactionState("waiting");
-      setReactionTime(-1); // Indicate false start
+      clearTimeout(reactionTimerRef.current as NodeJS.Timeout)
+      setReactionState("waiting")
+      setReactionTime(-1) // Indicate false start
     } else if (reactionState === "clicking") {
-      const endTime = Date.now();
-      const time = endTime - reactionStartTime;
-      setReactionTime(time);
+      const endTime = Date.now()
+      const time = endTime - reactionStartTime
+      setReactionTime(time)
 
       if (time < bestReactionTime && time > 0) {
-        setBestReactionTime(time);
-        localStorage.setItem("best_reaction_score", time.toString());
+        setBestReactionTime(time)
+        localStorage.setItem("best_reaction_score", time.toString())
       }
 
-      setReactionState("results");
+      setReactionState("results")
     } else if (reactionState === "results") {
-      setReactionState("waiting");
+      setReactionState("waiting")
     }
-  };
+  }
 
   // Clean up timers on unmount
   useEffect(() => {
     return () => {
-      if (clickTimerRef.current) clearInterval(clickTimerRef.current);
-      if (reactionTimerRef.current) clearTimeout(reactionTimerRef.current);
-    };
-  }, []);
+      if (clickTimerRef.current) clearInterval(clickTimerRef.current)
+      if (reactionTimerRef.current) clearTimeout(reactionTimerRef.current)
+    }
+  }, [])
 
   return (
     <div className="container mx-auto py-10 px-4">
       {/* 상단 배너 광고 */}
       <AdBanner />
 
-      <h1 className="text-4xl font-bold text-center mb-2">
-        Reaction Speed Test
-      </h1>
+      <h1 className="text-4xl font-bold text-center mb-2">Reaction Speed Test</h1>
       <p className="text-center text-muted-foreground mb-8 flex items-center justify-center">
         <Globe className="h-4 w-4 mr-1" />
         Test your skills and compete globally
@@ -158,9 +146,7 @@ export default function ReactionSpeedTest() {
             <div className="hidden lg:block">
               <div className="sticky top-4">
                 <div className="bg-gray-50 border rounded-lg p-4">
-                  <div className="text-xs text-gray-500 mb-2 text-center">
-                    Advertisement
-                  </div>
+                  <div className="text-xs text-gray-500 mb-2 text-center">Advertisement</div>
                   <SquareAd />
                 </div>
               </div>
@@ -172,8 +158,7 @@ export default function ReactionSpeedTest() {
                 <CardHeader>
                   <CardTitle className="text-2xl">Click Speed Test</CardTitle>
                   <CardDescription>
-                    Click as many times as you can in {clickTestTimeLeft}{" "}
-                    seconds to test your clicking speed.
+                    Click as many times as you can in {clickTestTime} seconds to test your clicking speed.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -181,15 +166,11 @@ export default function ReactionSpeedTest() {
                     <div className="flex items-center justify-between w-full mb-6">
                       <div className="flex items-center gap-2">
                         <MousePointer className="h-5 w-5" />
-                        <span className="text-xl font-bold">
-                          {clickCount} clicks
-                        </span>
+                        <span className="text-xl font-bold">{clickCount} clicks</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Clock className="h-5 w-5" />
-                        <span className="text-xl font-bold">
-                          {clickTestTimeLeft}s left
-                        </span>
+                        <span className="text-xl font-bold">{clickTestTimeLeft}s left</span>
                       </div>
                     </div>
 
@@ -232,12 +213,11 @@ export default function ReactionSpeedTest() {
                   <Button
                     variant="outline"
                     onClick={() => {
-                      setClickCount(0);
-                      setClicksPerSecond(0);
-                      setClickTestTimeLeft(10);
-                      if (clickTimerRef.current)
-                        clearInterval(clickTimerRef.current);
-                      setClickTestActive(false);
+                      setClickCount(0)
+                      setClicksPerSecond(0)
+                      setClickTestTimeLeft(clickTestTime)
+                      if (clickTimerRef.current) clearInterval(clickTimerRef.current)
+                      setClickTestActive(false)
                     }}
                     className="gap-2"
                   >
@@ -266,9 +246,7 @@ export default function ReactionSpeedTest() {
             <div className="hidden lg:block">
               <div className="sticky top-4">
                 <div className="bg-gray-50 border rounded-lg p-4">
-                  <div className="text-xs text-gray-500 mb-2 text-center">
-                    Advertisement
-                  </div>
+                  <div className="text-xs text-gray-500 mb-2 text-center">Advertisement</div>
                   <SquareAd />
                 </div>
               </div>
@@ -280,8 +258,7 @@ export default function ReactionSpeedTest() {
                 <CardHeader>
                   <CardTitle className="text-2xl">Reaction Time Test</CardTitle>
                   <CardDescription>
-                    Wait for the green color to appear, then click as quickly as
-                    possible.
+                    Wait for the green color to appear, then click as quickly as possible.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -292,10 +269,10 @@ export default function ReactionSpeedTest() {
                         reactionState === "waiting"
                           ? "bg-blue-500 hover:bg-blue-600"
                           : reactionState === "ready"
-                          ? "bg-yellow-500 hover:bg-yellow-500"
-                          : reactionState === "clicking"
-                          ? "bg-green-600 hover:bg-green-700"
-                          : "bg-purple-500 hover:bg-purple-600"
+                            ? "bg-yellow-500 hover:bg-yellow-500"
+                            : reactionState === "clicking"
+                              ? "bg-green-600 hover:bg-green-700"
+                              : "bg-purple-500 hover:bg-purple-600"
                       }`}
                       onClick={handleReactionClick}
                     >
@@ -303,9 +280,7 @@ export default function ReactionSpeedTest() {
                       {reactionState === "ready" && "Wait for green..."}
                       {reactionState === "clicking" && "CLICK NOW!"}
                       {reactionState === "results" &&
-                        (reactionTime === -1
-                          ? "Too early! Click to retry"
-                          : `${reactionTime} ms - Click to retry`)}
+                        (reactionTime === -1 ? "Too early! Click to retry" : `${reactionTime} ms - Click to retry`)}
                     </Button>
 
                     {reactionState === "results" && reactionTime > 0 && (
@@ -329,27 +304,25 @@ export default function ReactionSpeedTest() {
                       </div>
                     )}
 
-                    {bestReactionTime < Number.POSITIVE_INFINITY &&
-                      reactionState !== "results" && (
-                        <div className="mt-8 text-center">
-                          <h3 className="text-xl font-bold mb-2">Best Time</h3>
-                          <div className="flex items-center justify-center gap-2">
-                            <Trophy className="h-5 w-5 text-yellow-500" />
-                            <Badge variant="outline" className="text-lg">
-                              {bestReactionTime} ms
-                            </Badge>
-                          </div>
+                    {bestReactionTime < Number.POSITIVE_INFINITY && reactionState !== "results" && (
+                      <div className="mt-8 text-center">
+                        <h3 className="text-xl font-bold mb-2">Best Time</h3>
+                        <div className="flex items-center justify-center gap-2">
+                          <Trophy className="h-5 w-5 text-yellow-500" />
+                          <Badge variant="outline" className="text-lg">
+                            {bestReactionTime} ms
+                          </Badge>
                         </div>
-                      )}
+                      </div>
+                    )}
                   </div>
                 </CardContent>
                 <CardFooter className="flex justify-center">
                   <Button
                     variant="outline"
                     onClick={() => {
-                      setReactionState("waiting");
-                      if (reactionTimerRef.current)
-                        clearTimeout(reactionTimerRef.current);
+                      setReactionState("waiting")
+                      if (reactionTimerRef.current) clearTimeout(reactionTimerRef.current)
                     }}
                     className="gap-2"
                   >
@@ -379,11 +352,8 @@ export default function ReactionSpeedTest() {
       </div>
 
       <div className="text-center mt-10 text-sm text-muted-foreground">
-        <p>
-          Test your reaction time and clicking speed. Compare with friends
-          worldwide!
-        </p>
+        <p>Test your reaction time and clicking speed. Compare with friends worldwide!</p>
       </div>
     </div>
-  );
+  )
 }
